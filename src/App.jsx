@@ -35,12 +35,39 @@ function App() {
       });
   }
 
+  function handleDeleteBook(id) {
+    fetch('http://localhost:3000/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: 'david' })
+    })
+      .then(response => response.json())
+      .then(loginData => {
+        return fetch(`http://localhost:3000/books/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${loginData.token}`
+          }
+        });
+      })
+      .then(() => {
+        setBooks(books.filter(book => book.id !== id));
+      });
+  }
+
   return (
     <div>
       <h1>My Book List</h1>
       <AddBookForm onAddBook={handleAddBook} />
       {books.map(book => (
-        <BookCard key={book.id} title={book.title} author={book.author} rating={book.rating} />
+        <BookCard
+          key={book.id}
+          id={book.id}
+          title={book.title}
+          author={book.author}
+          rating={book.rating}
+          onDeleteBook={handleDeleteBook}
+        />
       ))}
     </div>
   );
