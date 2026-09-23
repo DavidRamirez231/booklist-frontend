@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import BookCard from './components/BookCard.jsx'
 import AddBookForm from './components/AddBookForm.jsx'
+import EditBookForm from './components/EditBookForm.jsx'
 import './App.css'
 
 function App() {
   const [books, setBooks] = useState([]);
+  const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
     fetch('http://localhost:3000/books')
@@ -12,23 +14,26 @@ function App() {
       .then(data => setBooks(data));
   }, []);
 
-  function handleAddBook(newBook) {
-    fetch('http://localhost:3000/login', {
+  function getToken() {
+    return fetch('http://localhost:3000/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: 'david' })
     })
       .then(response => response.json())
-      .then(loginData => {
-        return fetch('http://localhost:3000/books', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loginData.token}`
-          },
-          body: JSON.stringify(newBook)
-        });
-      })
+      .then(loginData => loginData.token);
+  }
+
+  function handleAddBook(newBook) {
+    getToken()
+      .then(token => fetch('http://localhost:3000/books', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(newBook)
+      }))
       .then(response => response.json())
       .then(createdBook => {
         setBooks([...books, createdBook]);
@@ -36,22 +41,29 @@ function App() {
   }
 
   function handleDeleteBook(id) {
-    fetch('http://localhost:3000/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: 'david' })
-    })
-      .then(response => response.json())
-      .then(loginData => {
-        return fetch(`http://localhost:3000/books/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${loginData.token}`
-          }
-        });
-      })
+    getToken()
+      .then(token => fetch(`http://localhost:3000/books/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      }))
       .then(() => {
         setBooks(books.filter(book => book.id !== id));
+      });
+  }
+
+  function handleUpdateBook(id, updatedFields) {
+    getToken()
+      .then(token => fetch(`http://localhost:3000/books/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(updatedFields)
+      }))
+      .then(() => {
+        setBooks(books.map(book => book.id === id ? { ...book, ...updatedFields } : book));
+        setEditingId(null);
       });
   }
 
@@ -60,14 +72,24 @@ function App() {
       <h1>My Book List</h1>
       <AddBookForm onAddBook={handleAddBook} />
       {books.map(book => (
-        <BookCard
-          key={book.id}
-          id={book.id}
-          title={book.title}
-          author={book.author}
-          rating={book.rating}
-          onDeleteBook={handleDeleteBook}
-        />
+        book.id === editingId ? (
+          <EditBookForm
+            key={book.id}
+            book={book}
+            onSaveEdit={handleUpdateBook}
+            onCancel={() => setEditingId(null)}
+          />
+        ) : (
+          <BookCard
+            key={book.id}
+            id={book.id}
+            title={book.title}
+            author={book.author}
+            rating={book.rating}
+            onDeleteBook={handleDeleteBook}
+            onEditBook={setEditingId}
+          />
+        )
       ))}
     </div>
   );
