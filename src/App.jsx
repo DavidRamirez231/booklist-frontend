@@ -4,18 +4,20 @@ import AddBookForm from './components/AddBookForm.jsx'
 import EditBookForm from './components/EditBookForm.jsx'
 import './App.css'
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function App() {
   const [books, setBooks] = useState([]);
   const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:3000/books')
+    fetch(`${API_URL}/books`)
       .then(response => response.json())
       .then(data => setBooks(data));
   }, []);
 
   function getToken() {
-    return fetch('http://localhost:3000/login', {
+    return fetch(`${API_URL}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: 'david' })
@@ -26,7 +28,7 @@ function App() {
 
   function handleAddBook(newBook) {
     getToken()
-      .then(token => fetch('http://localhost:3000/books', {
+      .then(token => fetch(`${API_URL}/books`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,7 +44,7 @@ function App() {
 
   function handleDeleteBook(id) {
     getToken()
-      .then(token => fetch(`http://localhost:3000/books/${id}`, {
+      .then(token => fetch(`${API_URL}/books/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       }))
@@ -53,7 +55,7 @@ function App() {
 
   function handleUpdateBook(id, updatedFields) {
     getToken()
-      .then(token => fetch(`http://localhost:3000/books/${id}`, {
+      .then(token => fetch(`${API_URL}/books/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
