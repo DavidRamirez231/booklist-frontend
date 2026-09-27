@@ -1,16 +1,23 @@
-# React + Vite
+# Book List (Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A React app for managing a book collection: add, view, edit, and delete books.
 
-Currently, two official plugins are available:
+**Live demo:** https://booklist-frontend-five.vercel.app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+> The backend runs on a free server that sleeps when idle, so the first load may take up to a minute.
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React (Vite)
+- Deployed on Vercel
+- Talks to a Node/Express REST API with JWT authentication and a Postgres database: [booklist backend](https://github.com/DavidRamirez231/booklist)
 
-## Expanding the Oxlint configuration
+## Run Locally
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+1. Start the backend first (see the backend repo)
+2. Install and run:
+```bash
+   npm install
+   npm run dev
+```
+3. Open `http://localhost:5173`
